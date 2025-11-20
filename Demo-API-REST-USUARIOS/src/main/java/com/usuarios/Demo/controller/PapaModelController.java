@@ -82,7 +82,7 @@ public class PapaModelController {
     }
 
     /* Actualizar papá existente */
-    @Operation(summary = "Actualiza un papá.", description = "Devuelve al papá si es que se creo.")
+    @Operation(summary = "Actualiza un papá.", description = "Devuelve al papá si es que se actualizó.")
     @ApiResponses({
         @ApiResponse(responseCode = "201", description = "¡Papá se ha actualizado correctamente!"),
         @ApiResponse(responseCode = "404", description = "No se pudo actualizar al papá."),

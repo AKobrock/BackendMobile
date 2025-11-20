@@ -100,7 +100,7 @@ public class UserModelController {
     }
 
 /*Actualizamos al user usando su id */
-    @Operation(summary = "Actualiza un usuario.", description = "Devuelve al usuario si es que se creo.")
+    @Operation(summary = "Actualiza un usuario.", description = "Devuelve al usuario si es que se actualizó.")
     @ApiResponses({
         @ApiResponse(responseCode = "201", description = "¡Usuario se ha actualizado correctamente!"),
         @ApiResponse(responseCode = "404", description = "No se pudo actualizar al usuario."),
