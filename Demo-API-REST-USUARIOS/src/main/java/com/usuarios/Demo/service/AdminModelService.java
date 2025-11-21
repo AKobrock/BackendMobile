@@ -5,82 +5,81 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
+
 import com.usuarios.Demo.model.AdminModel;
 import com.usuarios.Demo.repository.IAdminModelRepository;
+
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 
 @Service
-@Transactional //Toma todo como una sola transacción. Si una no funciona, no se entrega nada.
+@Transactional
 public class AdminModelService {
 
     private final IAdminModelRepository adminModelRepository;
 
-    public AdminModelService(IAdminModelRepository adminModelRepository){
+    public AdminModelService(IAdminModelRepository adminModelRepository) {
         this.adminModelRepository = adminModelRepository;
     }
 
+    /* Obtener todos los administradores */
     public List<AdminModel> getAllAdmins() {
-        List<AdminModel> admin = adminModelRepository.findAll();
-        if (admin.isEmpty()) {
-        throw new EntityNotFoundException("No existen administradores registrados en el sistema.");
+        List<AdminModel> admins = adminModelRepository.findAll();
+        if (admins.isEmpty()) {
+            throw new EntityNotFoundException("No existen administradores registrados en el sistema.");
         }
-    return admin;
+        return admins;
     }
 
+    /* Buscar administrador por ID */
     public AdminModel getAdminId(UUID id) {
-        return adminModelRepository.findById(id).orElse(null);
+        return adminModelRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Administrador no encontrado con ID " + id));
     }
 
-
-    public AdminModel CreateAdmin(AdminModel admin){
-        Optional<AdminModel> existeAdmin = adminModelRepository.findById(admin.getId());
-        if (existeAdmin.isPresent()) {
-            throw new EntityExistsException("El admin con el ID " + admin.getId() + " ya existe :)");
+    /* Crear un nuevo administrador */
+    public AdminModel createAdmin(AdminModel admin) {
+        if (admin.getId() != null && adminModelRepository.findById(admin.getId()).isPresent()) {
+            throw new EntityExistsException("El administrador con ID " + admin.getId() + " ya existe.");
         }
+
+        // Asignar rol automáticamente
+        admin.setRol("ADMIN");
+
         return adminModelRepository.save(admin);
     }
 
-    public AdminModel ActualizarAdmin(UUID id,AdminModel admin){
-        Optional<AdminModel> existeAdmin = adminModelRepository.findById(id);
-        if (existeAdmin.isEmpty()){
-            throw new EntityNotFoundException("El admin con ID " + admin.getId() + " no existe :(");
+    /* Actualizar datos de un administrador existente */
+    public AdminModel actualizarAdmin(UUID id, AdminModel admin) {
+        AdminModel adminActual = adminModelRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Administrador con ID " + id + " no encontrado."));
+
+        if (admin.getPassword() != null && !admin.getPassword().isEmpty()) {
+            adminActual.setPassword(admin.getPassword());
         }
 
-        AdminModel adminActual = existeAdmin.get();
-
-        if(admin.getPassword() !=null && !admin.getPassword().isEmpty()){
-            adminActual.setEmail(admin.getPassword());
-        }
-
-        if(admin.getEmail() != null && !admin.getEmail().isEmpty()){
+        if (admin.getEmail() != null && !admin.getEmail().isEmpty()) {
             adminActual.setEmail(admin.getEmail());
         }
 
-        if(admin.getAddress() != null && admin.getAddress().isEmpty()){
+        if (admin.getAddress() != null && !admin.getAddress().isEmpty()) {
             adminActual.setAddress(admin.getAddress());
         }
 
-        if(admin.getAvatarURL() != null && !admin.getAvatarURL().isEmpty()){
+        if (admin.getAvatarURL() != null && !admin.getAvatarURL().isEmpty()) {
             adminActual.setAvatarURL(admin.getAvatarURL());
         }
-        
+
         return adminModelRepository.save(adminActual);
     }
-    /*Usamos optional para evitar errores de tipo nullPinterException(cuadno intentamos
-      entrar en un objeto que es null) */
 
-    public String matarAdmin(UUID id){
-        Optional<AdminModel> existeAdmin = adminModelRepository.findById(id);
-        if(existeAdmin.isEmpty()){
-            throw new EntityNotFoundException("No se ha encontrado al administrador de ID " +id );
-        }
-        AdminModel admin = existeAdmin.get();
+    /* Eliminar un administrador */
+    public String matarAdmin(UUID id) {
+        AdminModel admin = adminModelRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("No se encontró al administrador con ID " + id));
+
         adminModelRepository.deleteById(id);
-
-        return "Se ha eliminado al admimistrador: " + admin.getUsername() + " " + admin.getLastname() + ", de ID: " + admin.getId();
-
+        return "Administrador eliminado: " + admin.getUsername() + " " + admin.getLastname();
     }
 }
-

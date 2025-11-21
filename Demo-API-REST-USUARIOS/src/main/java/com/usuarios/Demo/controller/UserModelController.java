@@ -16,6 +16,7 @@ import jakarta.persistence.EntityNotFoundException;
 
 @RestController
 @RequestMapping("/api/v1/users")
+@CrossOrigin(origins = "*", allowCredentials = "false")
 public class UserModelController {
 
     private final UserModelService userModelService;

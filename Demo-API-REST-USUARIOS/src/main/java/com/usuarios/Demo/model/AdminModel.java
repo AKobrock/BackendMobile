@@ -26,6 +26,6 @@ public class AdminModel {
     private String address;
     private String email;
     private String password;
-    private Boolean active;
+    private String rol;
 
 }
