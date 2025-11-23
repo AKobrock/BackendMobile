@@ -10,8 +10,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                //Permite tanto frontend como Swagger
-                .allowedOrigins("http://localhost:5173", "http://localhost:8080")
+                .allowedOriginPatterns("http://localhost:5173", "http://localhost:8080")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true);

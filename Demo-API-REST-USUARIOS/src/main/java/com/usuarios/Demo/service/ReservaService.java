@@ -25,10 +25,8 @@ public class ReservaService {
     private final IPapaModelRepository papaRepository;
     private final EmailService emailService;
 
-    public ReservaService(IReservaRepository reservaRepository,
-                          IUserModelRepository userRepository,
-                          IPapaModelRepository papaRepository,
-                          EmailService emailService) {
+    public ReservaService(IReservaRepository reservaRepository, IUserModelRepository userRepository,
+                          IPapaModelRepository papaRepository, EmailService emailService) {
         this.reservaRepository = reservaRepository;
         this.userRepository = userRepository;
         this.papaRepository = papaRepository;
