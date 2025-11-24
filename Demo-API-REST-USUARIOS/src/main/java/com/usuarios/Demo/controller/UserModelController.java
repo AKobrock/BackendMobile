@@ -11,6 +11,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import com.usuarios.Demo.dto.APIResponse;
+import com.usuarios.Demo.dto.LoginRequest;
+
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 
@@ -99,6 +101,34 @@ public class UserModelController {
             );
         }
     }
+
+/*Los loggeamos en el usuario */
+    @PostMapping("/auth/login")
+    @Operation(summary = "Login de usuario", description = "Permite al usuario autenticarse con email y password")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Login exitoso"),
+        @ApiResponse(responseCode = "401", description = "Credenciales incorrectas"),
+        @ApiResponse(responseCode = "500", description = "Error del servidor")
+    })
+    public ResponseEntity<APIResponse<UserModel>> login(@RequestBody LoginRequest loginRequest) {
+        try {
+            UserModel user = userModelService.login(loginRequest.getEmail(), loginRequest.getPassword());
+            if (user != null) {
+                return ResponseEntity.ok(
+                    new APIResponse<>("OK", "Login exitoso", user)
+                );
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                    new APIResponse<>("ERROR", "Credenciales incorrectas", null)
+                );
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                new APIResponse<>("ERROR", "Error inesperado al intentar login", null)
+            );
+        }
+    }
+
 
 /*Actualizamos al user usando su id */
     @Operation(summary = "Actualiza un usuario.", description = "Devuelve al usuario si es que se actualizó.")

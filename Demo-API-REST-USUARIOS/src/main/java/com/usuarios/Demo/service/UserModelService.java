@@ -45,23 +45,31 @@ public class UserModelService {
     }
 
     public UserModel createUser(UserModel user) {
-    if (user.getId() != null && userModelRepository.findById(user.getId()).isPresent()) {
-        throw new EntityExistsException("El usuario con ID " + user.getId() + " ya existe.");
+        if (user.getId() != null && userModelRepository.findById(user.getId()).isPresent()) {
+            throw new EntityExistsException("El usuario con ID " + user.getId() + " ya existe.");
+        }
+
+        user.setActive(true);
+        user.setLastActivity(LocalDateTime.now()); // Primera actividad
+        UserModel nuevo = userModelRepository.save(user);
+
+        // Enviar correo de bienvenida (sin romper si falla)
+        try {
+            emailService.enviarCorreoBienvenida(nuevo.getEmail(), nuevo.getUsername());
+        } catch (Exception e) {
+            System.err.println("⚠️ Error al enviar correo: " + e.getMessage());
+        }
+
+        return nuevo;
     }
 
-    user.setActive(true);
-    user.setLastActivity(LocalDateTime.now()); // Primera actividad
-    UserModel nuevo = userModelRepository.save(user);
-
-    // Enviar correo de bienvenida (sin romper si falla)
-    try {
-        emailService.enviarCorreoBienvenida(nuevo.getEmail(), nuevo.getUsername());
-    } catch (Exception e) {
-        System.err.println("⚠️ Error al enviar correo: " + e.getMessage());
+    public UserModel login(String email, String password) {
+        UserModel user = userModelRepository.findByEmail(email); // Asegúrate de que este método exista en tu repositorio
+        if (user != null && user.getPassword().equals(password)) {
+            return user;
+        }
+        return null;
     }
-
-    return nuevo;
-}
 
     public UserModel actualizarUser(UUID id, UserModel user) {
         Optional<UserModel> existeUser = userModelRepository.findById(id);
